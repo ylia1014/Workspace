@@ -5,13 +5,13 @@ export const summarizeArticle = async (url: string): Promise<Summary> => {
   const domain = new URL(url).hostname.replace('www.', '');
   
   try {
-    // 1. 기사 내용 추출 (예시: Mercury Parser API or 자체 크롤링)
+    // 1. Article content 
     const extractResponse = await axios.post('https://your-content-extractor-api.com/extract', {
       url
     });
     const { title, content } = extractResponse.data;
 
-    // 2. OpenAI API를 사용한 요약
+    // 2. Summarizing with OpenAI API
     const openaiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: 'gpt-4',
       messages: [
