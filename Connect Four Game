@@ -1,0 +1,94 @@
+from connect_four import *
+import random
+import time
+
+# Validation Strategy
+def my_evaluate_board(board):
+    if has_won(board, "X"):
+        return float("Inf")
+    elif has_won(board, "O"):
+        return -float("Inf")
+
+    x_two_streak = 0
+    o_two_streak = 0
+
+    for col in range(len(board) - 1):
+        for row in range(len(board[0])):
+            if board[col][row] == "X" and board[col + 1][row] == "X":
+                x_two_streak += 1
+            elif board[col][row] == "O" and board[col + 1][row] == "O":
+                o_two_streak += 1
+
+    return x_two_streak - o_two_streak
+
+# Printing function
+def print_board_pretty(board):
+    print("\n🧩 Current Board Status:")
+    for row in zip(*board[::-1]):
+        row_str = ""
+        for cell in row:
+            if cell == "X":
+                row_str += "❌ "
+            elif cell == "O":
+                row_str += "🟡 "
+            else:
+                row_str += "⬜ "
+        print(row_str)
+    print("1️⃣ 2️⃣ 3️⃣ 4️⃣ 5️⃣ 6️⃣ 7️⃣")
+
+# Gaming function
+def two_ai_game():
+    my_board = make_board()
+    round_number = 1
+
+    while not game_is_over(my_board):
+        print(f"\n🎲 Round {round_number}")
+
+        # X의 턴 (Codecademy 전략)
+        result = minimax(my_board, True, 4, -float("Inf"), float("Inf"), codecademy_evaluate_board)
+        print(f"❌ X Turn (Strategy: codecademy_evaluate_board, Score: {result[0]}) → Selected Column: {result[1]+1}")
+        select_space(my_board, result[1], "X")
+        print_board_pretty(my_board)
+
+        # Mid-Game Situation
+        mid_score = my_evaluate_board(my_board)
+        if mid_score > 0:
+            print("📊 Mid-Game Situation: X is slightly ahead!")
+        elif mid_score < 0:
+            print("📊 Mid-Game Situation: O is slightly ahead!")
+        else:
+            print("📊 Mid-Game Situation: It's quite close!")
+
+        if game_is_over(my_board):
+            break
+
+        time.sleep(1)
+
+        # 'O's turn (my strategy)'
+        result = minimax(my_board, False, 4, -float("Inf"), float("Inf"), my_evaluate_board)
+        print(f"🟡 O Turn (Strategy: my_evaluate_board, Score: {result[0]}) → Selected Column: {result[1]+1}")
+        select_space(my_board, result[1], "O")
+        print_board_pretty(my_board)
+
+        mid_score = my_evaluate_board(my_board)
+        if mid_score > 0:
+            print("📊 Mid-Game Situation: X is slightly ahead!")
+        elif mid_score < 0:
+            print("📊 Mid-Game Situation: O is slightly ahead!")
+        else:
+            print("📊 Mid-Game Situation: It's quite close!")
+
+        time.sleep(1)
+        round_number += 1
+
+    # Game summary
+    print("\n🧾 Game Over!")
+    print(f"🔁 {round_number} rounds played.")
+    if has_won(my_board, "X"):
+        print("🏆 X (codecademy Strategy) Won!")
+    elif has_won(my_board, "O"):
+        print("🏆 O (My Strategy) Won!")
+    else:
+        print("🤝 This game is a draw!")
+
+two_ai_game()
